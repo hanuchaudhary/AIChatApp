@@ -33,12 +33,17 @@ export const authOptions = {
                         throw new Error("Both identifier and password are required.");
                     }
 
+                    console.log("credentials", credentials);
+
+
                     // Find user by email OR username
                     const dbUser = await db.select()
                         .from(users)
                         .where(
                             or(eq(users.email, credentials.identifier), eq(users.username, credentials.identifier))
                         );
+
+                    console.log("dbUser", dbUser);
 
                     if (dbUser.length === 0) {
                         throw new Error("User not found.");

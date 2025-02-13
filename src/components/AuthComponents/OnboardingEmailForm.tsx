@@ -1,63 +1,86 @@
-"use client"
+"use client";
 
-import { onboardingSchema } from "@/validations/validations"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import type { z } from "zod"
-import { useRouter } from "next/navigation"
-import { useOnboardingStore } from "@/store/AuthStore"
-import { useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { onboardingSchema } from "@/validations/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useOnboardingStore } from "@/store/AuthStore";
+import { useEffect } from "react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import NextButton from "./NextButton";
+import BackButton from "./BackButton";
 
-const onboardingEmailSchema = onboardingSchema.pick({ email: true })
-type OnboardingEmailSchema = z.infer<typeof onboardingEmailSchema>
+const onboardingEmailSchema = onboardingSchema.pick({ email: true });
+type OnboardingEmailSchema = z.infer<typeof onboardingEmailSchema>;
 
 export default function OnboardingEmailForm() {
-  const router = useRouter()
-  const setData = useOnboardingStore((state) => state.setData)
-  const username = useOnboardingStore((state) => state.username)
+  const router = useRouter();
+  const setData = useOnboardingStore((state) => state.setData);
+  const username = useOnboardingStore((state) => state.username);
+  const email = useOnboardingStore((state) => state.email);
 
   const form = useForm<OnboardingEmailSchema>({
     resolver: zodResolver(onboardingEmailSchema),
     defaultValues: {
-      email: "",
+      email,
     },
-  })
+  });
 
   const onSubmit = form.handleSubmit((data) => {
-    setData(data)
-    router.push("/onboarding/password")
-  })
+    setData(data);
+    router.push("/onboarding/password");
+  });
 
   useEffect(() => {
-    if (!useOnboardingStore.persist.hasHydrated()) return
+    if (!useOnboardingStore.persist.hasHydrated()) return;
     if (!username) {
-      router.push("/onboarding/username")
+      router.push("/onboarding/username");
     }
-  }, [username, router])
+  }, [username, router]);
+
+  const handleContinue = () => {
+    onSubmit();
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="Enter your email" {...field} />
-              </FormControl>
-              <FormDescription>We'll never share your email with anyone else.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Next</Button>
-      </form>
-    </Form>
-  )
+    <div className="w-full max-w-md mx-auto bg-secondary-foreground rounded-xl p-6 py-10">
+      <Form {...form}>
+        <form onSubmit={onSubmit} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    {...field}
+                    className="bg-neutral-800 ring-0 outline-none border-none focus:outline-none focus:ring-0 focus:border-none"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex items-center gap-2">
+            <BackButton
+              handleBack={() => router.push("/onboarding/username")}
+            />
+            <NextButton handleContinue={handleContinue} />
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
 }
-

@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function page() {
-  return <OnboardingUsernameForm />;
+  return (
+    <div className="">
+      <OnboardingUsernameForm />
+    </div>
+  );
 }

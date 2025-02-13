@@ -1,12 +1,13 @@
 "use client";
 
-import { onboardingSchema } from "@/validations/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { z } from "zod";
 import { useOnboardingStore } from "@/store/AuthStore";
-import { Button } from "@/components/ui/button";
+import { onboardingSchema } from "@/validations/validations";
 import {
   Form,
   FormControl,
@@ -17,8 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import NextButton from "./NextButton";
 
 const onboardingUsernameSchema = onboardingSchema.pick({ username: true });
 type OnboardingUsernameSchema = z.infer<typeof onboardingUsernameSchema>;
@@ -29,11 +29,12 @@ export default function OnboardingUsernameForm() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
+  const prevUsername = useOnboardingStore((state) => state.username);
 
   const form = useForm<OnboardingUsernameSchema>({
     resolver: zodResolver(onboardingUsernameSchema),
     defaultValues: {
-      username: "",
+      username: prevUsername,
     },
   });
 
@@ -49,13 +50,13 @@ export default function OnboardingUsernameForm() {
       try {
         setIsLoading(true);
         const res = await axios.post("/api/username", { username });
-        setResponse(res.data.message); // "Username is available"
+        setResponse(res.data.message);
       } catch (error: any) {
         setResponse(error.response?.data?.error || "An error occurred.");
       } finally {
         setIsLoading(false);
       }
-    }, 500); // Debounce API calls
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [username]);
@@ -65,42 +66,49 @@ export default function OnboardingUsernameForm() {
     router.push("/onboarding/email");
   });
 
+  const handleContinue = () => {
+    onSubmit();
+  };
+
   return (
-    <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your username" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-              {isLoading ? (
-                <p className="text-blue-500 text-sm">Checking availability...</p>
-              ) : response ? (
-                <p
-                  className={`text-sm ${
-                    response.includes("taken")
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }`}
-                >
-                  {response}
-                </p>
-              ) : null}
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={isLoading}>
-          Next
-        </Button>
-      </form>
-    </Form>
+    <div className="w-full max-w-md mx-auto bg-secondary-foreground rounded-xl p-6 py-10">
+      <Form {...form}>
+        <form onSubmit={onSubmit} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username*</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your username"
+                    {...field}
+                    className="w-full outline-none focus:outline-none focus:ring-0 border-0 bg-neutral-800"
+                  />
+                </FormControl>
+                <FormMessage />
+                {isLoading ? (
+                  <p className="text-blue-500 text-sm mt-2">
+                    Checking availability...
+                  </p>
+                ) : response ? (
+                  <p
+                    className={`text-sm mt-2 ${
+                      response.includes("taken")
+                        ? "text-red-500"
+                        : "text-green-600"
+                    }`}
+                  >
+                    {response}
+                  </p>
+                ) : null}
+              </FormItem>
+            )}
+          />
+          <NextButton handleContinue={handleContinue} />
+        </form>
+      </Form>
+    </div>
   );
 }
