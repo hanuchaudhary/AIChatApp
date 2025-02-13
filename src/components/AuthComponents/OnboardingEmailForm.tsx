@@ -1,43 +1,42 @@
-"use client";
+"use client"
 
-import { onboardingSchema } from "@/validations/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
-import { useOnboardingStore } from "@/store/AuthStore";
+import { onboardingSchema } from "@/validations/validations"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import type { z } from "zod"
+import { useRouter } from "next/navigation"
+import { useOnboardingStore } from "@/store/AuthStore"
+import { useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 
-const onboardingEmailSchema = onboardingSchema.pick({ email: true });
-type OnboardingEmailSchema = z.infer<typeof onboardingEmailSchema>;
+const onboardingEmailSchema = onboardingSchema.pick({ email: true })
+type OnboardingEmailSchema = z.infer<typeof onboardingEmailSchema>
 
 export default function OnboardingEmailForm() {
-  const router = useRouter();
+  const router = useRouter()
+  const setData = useOnboardingStore((state) => state.setData)
+  const username = useOnboardingStore((state) => state.username)
+
   const form = useForm<OnboardingEmailSchema>({
+    resolver: zodResolver(onboardingEmailSchema),
     defaultValues: {
       email: "",
     },
-    resolver: zodResolver(onboardingEmailSchema),
-  });
-
-  const setData = useOnboardingStore((state) => state.setData);
+  })
 
   const onSubmit = form.handleSubmit((data) => {
-    console.log(data);
-    setData(data);
-    router.push("/onboarding/password");
-  });
+    setData(data)
+    router.push("/onboarding/password")
+  })
+
+  useEffect(() => {
+    if (!useOnboardingStore.persist.hasHydrated()) return
+    if (!username) {
+      router.push("/onboarding/username")
+    }
+  }, [username, router])
 
   return (
     <Form {...form}>
@@ -47,19 +46,18 @@ export default function OnboardingEmailForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="email" {...field} />
+                <Input type="email" placeholder="Enter your email" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription>We'll never share your email with anyone else.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Next</Button>
       </form>
     </Form>
-  );
+  )
 }
+

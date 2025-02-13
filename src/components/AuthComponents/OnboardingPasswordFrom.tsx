@@ -2,9 +2,12 @@
 
 import { onboardingSchema } from "@/validations/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useAuthStore, useOnboardingStore } from "@/store/AuthStore";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,11 +16,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { useRouter } from "next/router";
-import { useOnboardingStore } from "@/store/AuthStore";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const onboardingPasswordSchema = onboardingSchema.pick({
   password: true,
@@ -27,25 +27,47 @@ type OnboardingPasswordSchema = z.infer<typeof onboardingPasswordSchema>;
 
 export default function OnboardingPasswordForm() {
   const router = useRouter();
+  const { username, email } = useOnboardingStore();
+
   const form = useForm<OnboardingPasswordSchema>({
+    resolver: zodResolver(onboardingPasswordSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
-    resolver: zodResolver(onboardingPasswordSchema),
   });
 
-  const username = useOnboardingStore((state) => state.username);
-  const email = useOnboardingStore((state) => state.email);
+  const { isLoading, registerUser } = useAuthStore();
 
   const onSubmit = form.handleSubmit((data) => {
-    console.log({
-      ...data,
-      username,
+    if (data.password !== data.confirmPassword) {
+      form.setError("confirmPassword", {
+        type: "manual",
+        message: "Passwords do not match",
+      });
+      return;
+    }
+
+    if (!email || !username) {
+      router.push("/onboarding/email");
+      return;
+    }
+
+    registerUser({
       email,
+      username,
+      password: data.password,
     });
-    router.push("/chat");
+
+
   });
+
+  useEffect(() => {
+    if (!useOnboardingStore.persist.hasHydrated()) return;
+    if (!username || !email) {
+      router.push("/onboarding/email");
+    }
+  }, [username, email, router]);
 
   return (
     <Form {...form}>
@@ -55,12 +77,16 @@ export default function OnboardingPasswordForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
-                This is your public display name.
+                Use a strong password with at least 8 characters.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -71,12 +97,16 @@ export default function OnboardingPasswordForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input placeholder="confirm password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Confirm your password"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
-                This is your public display name.
+                Please re-enter your password to confirm.
               </FormDescription>
               <FormMessage />
             </FormItem>

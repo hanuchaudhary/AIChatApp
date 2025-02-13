@@ -2,7 +2,7 @@ import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
-import { user } from "../../../../../drizzle/schema";
+import { users } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { SessionStrategy } from "next-auth";
@@ -35,16 +35,19 @@ export const authOptions = {
 
                     // Find user by email OR username
                     const dbUser = await db.select()
-                        .from(user)
+                        .from(users)
                         .where(
-                            or(eq(user.email, credentials.identifier), eq(user.username, credentials.identifier))
+                            or(eq(users.email, credentials.identifier), eq(users.username, credentials.identifier))
                         );
 
                     if (dbUser.length === 0) {
                         throw new Error("User not found.");
                     }
 
-                    const foundUser = dbUser[0];
+                    const foundUser = {
+                        ...dbUser[0],
+                        username: dbUser[0].username ?? undefined,
+                    };
 
                     // Verify password
                     const isValidPassword = bcrypt.compare(credentials.password, foundUser.password!);
@@ -60,7 +63,7 @@ export const authOptions = {
         })
     ],
     pages: {
-        signIn: "/auth/signin",
+        signIn: "/signin",
     },
     session: {
         strategy: "jwt" as SessionStrategy,
