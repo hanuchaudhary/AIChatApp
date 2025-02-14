@@ -19,6 +19,20 @@ export const users = pgTable("user", {
     image: text("image"),
 })
 
+export const chats = pgTable("chat", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    name: text("name").notNull(),
+    description: text("description"),
+    creatorId: text("creatorId")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().$defaultFn(
+        () => new Date()
+    ),
+})
+
 export const accounts = pgTable(
     "account",
     {

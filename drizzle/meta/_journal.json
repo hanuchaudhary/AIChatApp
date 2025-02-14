@@ -15,6 +15,20 @@
       "when": 1739514630620,
       "tag": "0001_sloppy_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1739521999341,
+      "tag": "0002_strong_cloak",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1739524349676,
+      "tag": "0003_useful_anthem",
+      "breakpoints": true
     }
   ]
 }

@@ -4,39 +4,22 @@ import ThemeToggle from "./ThemeToggle";
 
 const Navbar: React.FC = () => {
   return (
-    <nav className="w-full fixed top-0 left-0" style={styles.navbar}>
-      <ul style={styles.navList}>
-        <li style={styles.navItem}>
+    <nav className="rounded-2xl max-w-7xl mx-auto flex items-center justify-between p-4 bg-primary-foreground/30 backdrop-blur-md text-primary ">
+      <h2 className="text-xl font-semibold">Chat.io</h2>
+      <ul className="flex items-center space-x-4">
+        <li>
           <Link href="/">Home</Link>
         </li>
-        <li style={styles.navItem}>
+        <li>
           <Link href="/about">About</Link>
         </li>
-        <li style={styles.navItem}>
+        <li>
           <Link href="/contact">Contact</Link>
         </li>
-        <ThemeToggle/>
+        <ThemeToggle />
       </ul>
     </nav>
   );
-};
-
-const styles = {
-  navbar: {
-    padding: "1rem",
-    backgroundColor: "#333",
-    color: "#fff",
-  },
-  navList: {
-    listStyle: "none",
-    display: "flex",
-    justifyContent: "space-around",
-    margin: 0,
-    padding: 0,
-  },
-  navItem: {
-    margin: "0 1rem",
-  },
 };
 
 export default Navbar;
