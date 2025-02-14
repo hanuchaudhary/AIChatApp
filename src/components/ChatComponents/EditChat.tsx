@@ -33,7 +33,6 @@ export default function EditChat({ id }: { id: string }) {
     if (editingChat) {
       await updateChat(id, editingChat.name, editingChat.description);
       setEditingChat(null);
-      fetchChats();
     }
   };
 

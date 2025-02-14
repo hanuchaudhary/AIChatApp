@@ -16,11 +16,10 @@ import { Trash2 } from "lucide-react";
 
 export default function DeleteChat({ id }: { id: string }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { deleteChat, fetchChats } = useChatStore();
+  const { deleteChat } = useChatStore();
 
   const handleDelete = async () => {
     await deleteChat(id);
-    fetchChats();
     setIsDeleteDialogOpen(false);
   };
 

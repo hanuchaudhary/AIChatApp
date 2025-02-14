@@ -59,9 +59,19 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         try {
             await axios.put("/api/chat", { id, name, description });
             toast({
-                title: "Chat updated successfully",
+                title: "Chat updated successfully", 
                 description: `Chat "${name}" updated successfully`,
             })
+
+            set((state) => ({
+                chatList: state.chatList.map((chat) => {
+                    if (chat.id === id) {
+                        return { ...chat, name, description };
+                    }
+                    return chat;
+                })
+            }));
+
         } catch (error: any) {
             toast({
                 title: "Failed to update chat",
@@ -79,6 +89,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
                 title: "Chat deleted successfully",
                 description: `Chat deleted successfully`,
             })
+            set((state) => ({ chatList: state.chatList.filter((chat) => chat.id !== id) }));
         } catch (error: any) {
             toast({
                 title: "Failed to delete chat",
