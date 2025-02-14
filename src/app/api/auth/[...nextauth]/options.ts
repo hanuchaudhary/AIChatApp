@@ -35,8 +35,6 @@ export const authOptions = {
 
                     console.log("credentials", credentials);
 
-
-                    // Find user by email OR username
                     const dbUser = await db.select()
                         .from(users)
                         .where(

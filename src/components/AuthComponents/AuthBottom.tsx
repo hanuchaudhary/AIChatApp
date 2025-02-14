@@ -7,7 +7,7 @@ import React from "react";
 export default function AuthBottom() {
   const pathname = usePathname();
   return (
-    <div className="border border-secondary-foreground w-96 rounded-full p-6 text-sm">
+    <div className="border border-secondary w-[28rem] rounded-full px-6 py-4 text-sm">
       {pathname === "/signin" ? (
         <p>
           Not have an Account?{" "}

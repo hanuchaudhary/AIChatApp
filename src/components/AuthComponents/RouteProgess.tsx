@@ -39,7 +39,7 @@ export const RouteProgress = ({ children }: { children: React.ReactNode }) => {
             width: step === 1 ? "24px" : step === 2 ? "60px" : "96px",
             x: 0,
           }}
-          className="absolute -left-[8px] -top-[8px] -translate-y-1/2 h-3 bg-emerald-600 rounded-full"
+          className="absolute -left-[8px] -top-[8px] -translate-y-1/2 h-3 bg-blue-500 rounded-full"
           transition={{
             type: "spring",
             stiffness: 300,

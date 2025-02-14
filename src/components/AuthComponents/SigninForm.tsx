@@ -1,9 +1,20 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { FormEvent, useState } from "react";
-import AuthBottom from "./AuthBottom";
+import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Github } from "lucide-react";
 import GithubLogin from "./GithubLogin";
 
 export default function SigninForm() {
@@ -11,58 +22,84 @@ export default function SigninForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signIn("credentials", {
-      email: credentials.email,
+
+    const res = await signIn("credentials", {
+      identifier: credentials.email,
       password: credentials.password,
+      redirect: false,
     });
 
-    router.push("/chat");
+    if (res?.error) {
+      alert("Invalid credentials. Please try again.");
+      setLoading(false);
+      return;
+    }
 
+    router.push("/chat");
     setLoading(false);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center flex-col gap-4">
-      <div className="bg-secondary-foreground p-6 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email or Username"
-            value={credentials.email}
-            onChange={handleChange}
-            className="w-full p-2 border text-black border-gray-300 rounded"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={credentials.password}
-            onChange={handleChange}
-            className="w-full p-2 text-black border border-gray-300 rounded"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-        <div className="my-4 text-center">OR</div>
-       <GithubLogin/>
-      </div>
-      <AuthBottom />
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="min-w-96">
+        <CardHeader>
+          <CardTitle>Sign In</CardTitle>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email or Username</Label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="m@example.com"
+                value={credentials.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="relative w-full">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          <GithubLogin />
+        </CardFooter>
+      </Card>
     </div>
   );
 }

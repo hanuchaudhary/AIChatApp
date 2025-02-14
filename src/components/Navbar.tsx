@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const Navbar: React.FC = () => {
         <li style={styles.navItem}>
           <Link href="/contact">Contact</Link>
         </li>
+        <ThemeToggle/>
       </ul>
     </nav>
   );

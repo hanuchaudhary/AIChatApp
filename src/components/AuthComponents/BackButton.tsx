@@ -19,7 +19,7 @@ export default function BackButton({
         opacity: { duration: 0.2 },
       }}
       onClick={handleBack}
-      className="px-4 py-3 text-black flex items-center justify-center  bg-neutral-100  font-semibold rounded-full hover:bg-neutral-50 transition-colors flex-1 w-16 text-sm"
+      className="px-4 py-3 flex items-center justify-center bg-primary-foreground font-semibold rounded-full text-sm"
     >
       Back
     </motion.button>

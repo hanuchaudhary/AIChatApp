@@ -8,16 +8,19 @@ import { CircleCheck } from "lucide-react";
 
 export default function NextButton({
   handleContinue,
+  isLoading = false,
 }: {
   handleContinue: VoidFunction;
+  isLoading?: boolean;
 }) {
   const pathname = usePathname();
   return (
     <motion.button
       type="submit"
       onClick={handleContinue}
+      disabled={isLoading}
       className={cn(
-        "px-4 py-3 rounded-full text-white bg-[#006cff]   transition-colors flex-1 w-56"
+        "px-4 py-3 rounded-full disabled:bg-blue-600/40 text-white bg-blue-600   transition-colors flex-1 w-56"
       )}
     >
       <div className="flex items-center font-[600] justify-center gap-2 text-sm">
@@ -33,10 +36,17 @@ export default function NextButton({
               bounce: 0.4,
             }}
           >
-            <CircleCheck size={16} />
+            <CircleCheck
+              className={isLoading ? "animate-spin" : ""}
+              size={16}
+            />
           </motion.div>
         )}
-        {pathname === "/onboarding/password" ? "Finish" : "Continue"}
+        {pathname === "/onboarding/password"
+          ? "Finish"
+          : isLoading
+          ? "Registering..."
+          : "Continue"}
       </div>
     </motion.button>
   );

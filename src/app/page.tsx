@@ -4,7 +4,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-white w-full flex items-center justify-center">
+    <div className="min-h-screen w-full flex items-center justify-center">
       <Link href={"/onboarding/username"}>
         <Button>Register</Button>
       </Link>

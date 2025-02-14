@@ -52,7 +52,7 @@ export default function OnboardingEmailForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-secondary-foreground rounded-xl p-6 py-10">
+    <div className="w-full max-w-md mx-auto bg-secondary rounded-xl p-6 py-10">
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-8">
           <FormField
@@ -66,7 +66,7 @@ export default function OnboardingEmailForm() {
                     type="email"
                     placeholder="Enter your email"
                     {...field}
-                    className="bg-neutral-800 ring-0 outline-none border-none focus:outline-none focus:ring-0 focus:border-none"
+                    className="dark:bg-neutral-700 bg-neutral-200 focus:ring-0 focus:border-none focus:outline-none outline-none"
                   />
                 </FormControl>
                 <FormMessage />
