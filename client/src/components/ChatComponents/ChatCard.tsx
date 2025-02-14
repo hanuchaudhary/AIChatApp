@@ -20,9 +20,9 @@ export default function ChatCard({
   description: string;
 }) {
   return (
-    <div className="relative border p-3 group rounded-2xl hover:border-emerald-600 cursor-pointer transition-all duration-300 hover:shadow-md">
+    <div className="relative border p-3 group rounded-2xl hover:border-emerald-600 transition-all duration-300 hover:shadow-md">
       <Link href={`/chat/${name}`}>
-        <div>
+        <div className="cursor-pointer">
           <h2 className="text-lg font-semibold mb-4 group-hover:text-emerald-600 transition-colors duration-300">
             {name}
           </h2>
