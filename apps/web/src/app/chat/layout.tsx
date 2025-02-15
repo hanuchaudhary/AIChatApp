@@ -1,5 +1,3 @@
-import { Navbar } from "@/components/Navbar";
-
 export default function ChatLayout({
     children,
 }: Readonly<{
@@ -7,10 +5,7 @@ export default function ChatLayout({
 }>) {
     return (
         <div className="h-screen w-full flex">
-            <Navbar />
-            <div>
-                {children}
-            </div>
+            {children}
         </div>
     );
 }

@@ -1,8 +1,5 @@
-import { db } from "@/db";
 import { NextRequest, NextResponse } from "next/server";
-import { users } from "@/db/schema"; // Ensure this is correctly named
-import { eq } from "drizzle-orm";
-
+import prisma from "@repo/database";
 export async function POST(request: NextRequest) {
     try {
         const { username } = await request.json();
@@ -11,9 +8,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Username is required." }, { status: 400 });
         }
 
-        const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                username,
+            },
+        });
 
-        if (existingUser.length > 0) {
+        if (existingUser) {
             return NextResponse.json({ error: "Username is already taken." }, { status: 400 });
         }
 

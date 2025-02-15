@@ -1,9 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
-import { db } from "@/db";
-import { chats, userChats, users } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import prisma from "@repo/database";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,9 +11,13 @@ export async function POST(request: NextRequest) {
   try {
     const { userIds, chatId }: { userIds: string[]; chatId: string } =
       await request.json();
-    await db
-      .insert(userChats)
-      .values(userIds.map((userId: string) => ({ userId, chatId })));
+
+    await prisma.userChat.createMany({
+      data: userIds.map((userId) => ({
+        userId,
+        chatId,
+      })),
+    });
 
     return NextResponse.json(
       { message: userIds.length + " Users added to chat" },
@@ -34,17 +36,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { chatId } = await request.json();
-    const chatUsers = await db
-      .select({ userId: userChats.userId })
-      .from(userChats)
-      .where(eq(userChats.chatId, chatId));
 
-    const userIds = chatUsers.map((user) => user.userId);
-
-    const chatUsersData = await db
-      .select()
-      .from(users)
-      .where(inArray(users.id, userIds));
+    const chatUsers = await prisma.chat.findUnique({
+      where: { id: session.user.id },
+      include: { users: { include: { user: true } } },
+    });
 
     return NextResponse.json(chatUsers, { status: 200 });
   } catch (error) {
@@ -64,30 +60,40 @@ export async function DELETE(request: NextRequest) {
       await request.json();
 
     // Check if the chat exists
-    const chatExists = await db
-      .select()
-      .from(chats)
-      .where(eq(chats.id, chatId));
+    const chatExists = await prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+    });
 
-    if (chatExists.length === 0) {
+    if (!chatExists) {
       return NextResponse.json({ error: "Chat not found" }, { status: 404 });
     }
 
-    const isCreator = await db
-      .select()
-      .from(chats)
-      .where(and(eq(chats.id, chatId), eq(chats.creatorId, session.user.id)));
+    const isCreator = await prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+      select: {
+        creatorId: true,
+      },
+    });
 
-    if (isCreator.length === 0) {
+    if (!isCreator) {
       return NextResponse.json(
         { error: "Only the creator can remove users" },
         { status: 403 }
       );
     }
 
-    await db
-      .delete(userChats)
-      .where(and(eq(userChats.chatId, chatId), eq(userChats.userId, userId)));
+    await prisma.userChat.delete({
+      where: {
+        userId_chatId: {
+          userId,
+          chatId,
+        },
+      },
+    });
 
     return NextResponse.json({
       success: true,

@@ -20,9 +20,9 @@ export default function ChatArea() {
     }
 
     return (
-        <div className="h-full flex bg-neutral-700 w-96">
+        <div className="h-full flex w-96 border-r border-r-primary-foreground">
             <div className="flex flex-col flex-grow">
-                <div className="flex items-center justify-between p-4 border-b">
+                <div className="flex items-center bg-neutral-950 justify-between p-4 border-b">
                     <h1 className="text-xl font-semibold">{chatname}</h1>
                 </div>
 

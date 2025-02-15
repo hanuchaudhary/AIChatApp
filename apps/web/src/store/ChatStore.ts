@@ -7,8 +7,8 @@ interface ChatStore {
     chatList: chatInterface[]
     fetchChats: () => Promise<void>
 
-    createChat: (name: string, description: string) => Promise<void>
-    updateChat: (id: string, name: string, description: string) => Promise<void>
+    createChat: (title: string, description: string) => Promise<void>
+    updateChat: (id: string, title: string, description: string) => Promise<void>
     deleteChat: (id: string) => Promise<void>
     setIsLoading: (isLoading: boolean) => void
     isLoading: boolean
@@ -32,13 +32,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             set({ isLoading: false });
         }
     },
-    createChat: async (name, description) => {
+    createChat: async (title, description) => {
         set({ isLoading: true });
         try {
-            const response = await axios.post("/api/chat", { name, description });
+            const response = await axios.post("/api/chat", { title, description });
             toast({
                 title: "Chat created successfully",
-                description: `Chat "${name}" created successfully`,
+                description: `Chat "${title}" created successfully`,
             })
 
             const createdChat = response.data;
@@ -54,19 +54,19 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             set({ isLoading: false });
         }
     },
-    updateChat: async (id, name, description) => {
+    updateChat: async (id, title, description) => {
         set({ isLoading: true });
         try {
-            await axios.put("/api/chat", { id, name, description });
+            await axios.put("/api/chat", { id, title, description });
             toast({
                 title: "Chat updated successfully", 
-                description: `Chat "${name}" updated successfully`,
+                description: `Chat "${title}" updated successfully`,
             })
 
             set((state) => ({
                 chatList: state.chatList.map((chat) => {
                     if (chat.id === id) {
-                        return { ...chat, name, description };
+                        return { ...chat, title, description };
                     }
                     return chat;
                 })
