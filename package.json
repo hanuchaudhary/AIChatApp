@@ -1,12 +1,13 @@
 {
-  "name": "ai-chat-app",
+  "name": "app",
+  "type": "module",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo check-types"
+    "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "prettier": "^3.5.0",
@@ -16,7 +17,7 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@10.1.0",
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "apps/*",
     "packages/*"
