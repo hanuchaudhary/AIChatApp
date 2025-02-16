@@ -20,7 +20,7 @@ export function ChatList() {
           <ChatCard
             id={chat.id}
             description={chat.description}
-            name={chat.name}
+            title={chat.title}
             key={chat.id}
           />
         ))}

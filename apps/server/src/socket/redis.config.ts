@@ -1,19 +1,28 @@
 import { Redis } from "ioredis";
+import "dotenv/config";
 
 const ENV = {
-    REDIS_HOST: process.env.REDIS_HOST,
-    REDIS_PORT: process.env.REDIS_PORT!,
-    REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-}
+    REDIS_HOST: process.env.REDIS_HOST || "localhost",
+    REDIS_PORT: process.env.REDIS_PORT || "6379",
+};
 
-if (!ENV.REDIS_HOST || !ENV.REDIS_PORT) {
-    throw new Error("REDIS_HOST is required and REDIS_PORT is required");
+// Ensure REDIS_PORT is a valid number
+const redisPort = Number(ENV.REDIS_PORT);
+if (!ENV.REDIS_HOST || isNaN(redisPort)) {
+    throw new Error("REDIS_HOST and a valid REDIS_PORT are required");
 }
 
 const redis = new Redis({
-  host: ENV.REDIS_HOST,
-  port: parseInt(ENV.REDIS_PORT),
-  password: ENV.REDIS_PASSWORD,
+    host: ENV.REDIS_HOST,
+    port: redisPort,
+});
+
+redis.on("error", (err) => {
+  console.error("Redis Error:", err);
+});
+
+redis.on("connect", () => {
+  console.log("✅Redis connected successfully!");
 });
 
 export default redis;

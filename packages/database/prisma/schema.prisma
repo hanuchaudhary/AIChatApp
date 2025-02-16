@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String     @id @default(uuid())
   name          String?
   username      String     @unique
   password      String
@@ -30,9 +30,9 @@ model User {
 }
 
 model Chat {
-  id          String     @id @default(cuid())
+  id          String     @id @default(uuid())
   title       String
-  description String
+  description String?
   creatorId   String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -50,7 +50,7 @@ model UserChat {
 }
 
 model Message {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   chatId    String
   chat      Chat     @relation(fields: [chatId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
@@ -60,7 +60,7 @@ model Message {
 }
 
 model Account {
-  id                 String    @id @default(cuid())
+  id                 String    @id @default(uuid())
   userId             String
   providerType       String
   providerId         String
@@ -76,7 +76,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   userId       String
   expires      DateTime
   sessionToken String   @unique
@@ -87,7 +87,7 @@ model Session {
 }
 
 model VerificationRequest {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   identifier String
   token      String   @unique
   expires    DateTime

@@ -65,7 +65,6 @@ export default function SigninForm() {
               <Label htmlFor="email">Email or Username</Label>
               <Input
                 id="email"
-                type="email"
                 name="email"
                 placeholder="m@example.com"
                 value={credentials.email}
