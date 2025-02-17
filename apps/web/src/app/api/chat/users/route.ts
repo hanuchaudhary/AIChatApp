@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
     const usersInChat = await prisma.userChat.findMany({
       where: {
         chatId,
-        userId: { not: session.user.id },
+        userId: { not: session.user.id},
       },
       include: {
         user: {

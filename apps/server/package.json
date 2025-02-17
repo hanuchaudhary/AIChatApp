@@ -12,6 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@repo/database": "*"
+    "@google/generative-ai": "^0.21.0",
+    "@repo/database": "*",
+    "dotenv": "^16.4.7"
   }
 }

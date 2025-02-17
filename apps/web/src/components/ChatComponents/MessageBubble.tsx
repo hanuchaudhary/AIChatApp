@@ -14,10 +14,11 @@ export const MessageBubble = ({
   isMe,
   message,
   username,
+  avatar
 }: MessageBubbleProps) => {
   return (
     <div className={`flex gap-2 mt-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
-      <UserAvatar fallback="" src="" />
+      <UserAvatar fallback={username} src={avatar} />
       <div
         className={`flex flex-col max-w-xs p-2 rounded-lg ${
           isMe ? "bg-primary text-primary-foreground" : "bg-blue-600 text-white"

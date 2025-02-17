@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -14,7 +12,6 @@ import { ChatHeader } from "./ChatHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MessageBubble } from "./MessageBubble";
 import { Send } from "lucide-react";
-import { UserAvatar } from "../UserAvatar";
 import { useChatStore } from "@/store/ChatStore";
 import { userTypes } from "@/types/types";
 
@@ -94,7 +91,7 @@ export default function ChatArea() {
   const [filteredUsers, setFilteredUsers] = useState<userTypes[]>([]);
   const [mentionQuery, setMentionQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const {chatUsers} = useChatStore()
+  const { chatUsers } = useChatStore()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -113,7 +110,7 @@ export default function ChatArea() {
       const filtered = chatUsers.filter((user) =>
         user.username.toLowerCase().startsWith(query)
       );
-      setFilteredUsers(filtered);
+      setFilteredUsers([...filtered, { id: "yakyak", username: "YakBot", image: "https://i.pinimg.com/474x/32/85/d7/3285d7a00dc65dfb890dffa978b7fd64.jpg", email: "yakyakai@gmail.com" }]);
     } else {
       setShowMentionPopup(false);
       setMentionQuery("");
@@ -173,12 +170,11 @@ export default function ChatArea() {
       {showMentionPopup && (
         <div className="absolute bottom-14 left-4 mt-1 w-48 bg-secondary shadow-lg rounded-md lowercase overflow-hidden space-y-1 p-1">
           {filteredUsers.length > 0 ? (
-            filteredUsers.map((user,index) => (
+            filteredUsers.map((user, index) => (
               <span
                 key={user.id}
-                className={`flex items-center p-1 rounded-md text-sm bg-primary-foreground cursor-pointer ${
-                  selectedIndex === index ? "bg-neutral-600" : "hover:bg-neutral-600"
-                }`}
+                className={`flex items-center p-1 rounded-md text-sm bg-primary-foreground cursor-pointer ${selectedIndex === index ? "bg-neutral-600" : "hover:bg-neutral-600"
+                  }`}
                 onClick={() => selectUser(user)}
               >
                 @{user.username}
