@@ -1,7 +1,7 @@
 import http from "http";
 import express from "express";
 import { Server } from "socket.io";
-import { socketInit } from "./socket/socket.js";
+import { socketInit } from "./socket/socket.config.js";
 
 // import { createAdapter } from "@socket.io/redis-streams-adapter";
 // import redis from "./socket/redis.config";

@@ -13,8 +13,10 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { chatId } = await params;
+
     // const chatId = request.nextUrl.searchParams.get("chatId");
-    if (!params.chatId) {
+    if (!chatId) {
       return NextResponse.json(
         { error: "Chat ID is required" },
         { status: 400 }
@@ -22,8 +24,8 @@ export async function GET(
     }
 
     const messages = await prisma.message.findMany({
-    where: {
-        chatId: params.chatId,
+      where: {
+        chatId: chatId,
       },
       include: {
         user: true,
@@ -36,6 +38,36 @@ export async function GET(
     return NextResponse.json(messages, { status: 200 });
   } catch (error) {
     console.error("Chat fetch error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest, { params }: { params: { chatId: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
+    const { chatId } = await params;
+
+    if (!chatId)
+      return NextResponse.json(
+        { error: "Chat ID is required" },
+        { status: 400 }
+      );
+
+    const chat = await prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+    });
+
+    return NextResponse.json(chat, { status: 200 });
+  } catch (error) {
+    console.error("Chat creation error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

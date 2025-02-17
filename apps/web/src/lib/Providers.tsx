@@ -1,9 +1,9 @@
 "use client";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
+import { Toaster } from "sonner";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +16,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       >
         {children}
       </ThemeProvider>
-      <Toaster />
+      <Toaster richColors duration={1500} />
     </SessionProvider>
   );
 }

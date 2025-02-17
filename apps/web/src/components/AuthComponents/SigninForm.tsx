@@ -14,9 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Github } from "lucide-react";
 import GithubLogin from "./GithubLogin";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function SigninForm() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
@@ -38,10 +37,7 @@ export default function SigninForm() {
     });
 
     if (res?.error) {
-      toast({
-        title: "Failed to sign in",
-        description: res.error,
-      })
+      toast.error(res.error);
       setLoading(false);
       return;
     }

@@ -16,6 +16,13 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "database:migrate": {
+      "cache": true,
+      "persistent": true
+    },
+    "database:generate": {
+      "cache": false
     }
   }
 }

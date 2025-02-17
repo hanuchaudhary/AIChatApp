@@ -2,8 +2,8 @@ import { onboardingSchema } from "@/validations/validations";
 import { create } from "zustand";
 import { createJSONStorage, persist, PersistOptions } from "zustand/middleware";
 import { z } from "zod";
-import axios from "axios";
-import { toast } from "@/hooks/use-toast";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
 
 type OnboardingData = Partial<z.infer<typeof onboardingSchema>>;
 
@@ -24,7 +24,15 @@ export const useOnboardingStore = create<OnboardingState>()(
 );
 
 interface AuthStore {
-  registerUser: ({ email, password, username }: { email: string, password: string, username: string }) => void;
+  registerUser: ({
+    email,
+    password,
+    username,
+  }: {
+    email: string;
+    password: string;
+    username: string;
+  }) => void;
   isLoading: boolean;
 }
 
@@ -36,20 +44,20 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const response = await axios.post("/api/auth/register", {
         email,
         password,
-        username
+        username,
       });
       console.log(response);
-      toast({
-        title: "Account created",
-        description: "Your account has been created successfully",
-      })
+      toast.success("Account created successfully");
     } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "An error occurred while creating your account",
-      })
-    }finally{
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ||
+            "An error occurred while creating your account"
+        );
+      } else {
+        toast.error("An error occurred while creating your account");
+      }
+    } finally {
       set({ isLoading: false });
     }
   },

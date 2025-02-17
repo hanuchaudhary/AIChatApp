@@ -1,100 +1,114 @@
-"use client";
+"use client"
 
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { getSocket } from "@/lib/socket.config";
-import { useSession } from "next-auth/react";
-import { useMessages } from "@/hooks/useMessages";
+import type React from "react"
+
+import { useEffect, useMemo, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { getSocket } from "@/lib/socket.config"
+import { useMessages } from "@/hooks/useMessages"
+import { ChatHeader } from "./ChatHeader"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type SocketDataType = {
-    message: string;
-    chatId: string;
-    userId: string;
-};
+  message: string
+  chatId: string
+  userId: string
+}
 
 export default function ChatArea() {
-    const { data } = useSession();
-    const pathname = usePathname();
-    const chatId = pathname.split("/")[2];
+  const { data: session } = useSession()
+  const pathname = usePathname()
+  const chatId = pathname.split("/")[2]
 
-    const [message, setMessage] = useState("");
-    const { messages, isLoading, setMessages } = useMessages(chatId);
+  const [message, setMessage] = useState("")
+  const { messages, isLoading, setMessages } = useMessages(chatId)
 
-    const socket = useMemo(() => {
-        const newSocket = getSocket();
-        newSocket.auth = { room: chatId };
-        return newSocket;
-    }, [chatId]);
+  const socket = useMemo(() => {
+    const newSocket = getSocket()
+    newSocket.auth = { room: chatId }
+    return newSocket
+  }, [chatId])
 
-    useEffect(() => {
-        socket.connect();
+  useEffect(() => {
+    socket.connect()
 
-        socket.on("message", (data: SocketDataType) => {
-            setMessages((prev) => [...prev, data]);
-        });
+    const handleNewMessage = (data: SocketDataType) => {
+      //@ts-ignore
+      setMessages((prev) => [...prev, data])
+    }
 
-        return () => {
-            socket.off("message");
-            socket.disconnect();
-        };
-    }, [socket]);
+    socket.on("message", handleNewMessage)
 
-    const sendMessage = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (message.trim().length === 0) return;
+    return () => {
+      socket.off("message", handleNewMessage)
+      socket.disconnect()
+    }
+  }, [socket, setMessages])
 
-        const newMessage: SocketDataType = {
-            message,
-            chatId,
-            userId: data?.user.id || "",
-        };
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (message.trim().length === 0) return
 
-        socket.emit("message", newMessage);
-        setMessages((prev) => [...prev, newMessage]);
-        setMessage("");
-    };
+    const newMessage: SocketDataType = {
+      message,
+      chatId,
+      userId: session?.user?.id || "",
+    }
 
-    const scrollRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    socket.emit("message", newMessage)
+    //@ts-ignore
+    setMessages((prev) => [...prev, newMessage])
+    setMessage("")
+  }
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
-    return (
-        <div className="h-full flex w-96 border-r border-r-primary-foreground">
-            <div className="flex flex-col flex-grow">
-                <div className="flex items-center bg-neutral-950 justify-between p-4 border-b">
-                    <h1 className="text-xl font-semibold">{chatId}</h1>
-                </div>
+  return (
+    <div className="flex flex-col rounded-l-2xl overflow-hidden h-full w-[28rem] border-r border-r-primary-foreground">
+      <ChatHeader />
 
-                <ScrollArea className="p-4 h-[50vh] overflow-y-scroll">
-                    {messages.map((msg, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                            <div className="bg-neutral-950 p-2 rounded-lg">
-                                <p>{msg.message}</p>
-                            </div>
-                        </div>
-                    ))}
-                    <div ref={scrollRef} />
-                </ScrollArea>
-
-                <form onSubmit={sendMessage} className="flex items-center space-x-4 p-4">
-                    <input
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className="w-full bg-neutral-950 rounded-lg p-2"
-                        placeholder="Type a message..."
-                    />
-                    <button
-                        type="submit"
-                        className="bg-primary-500 text-white rounded-lg p-2"
-                    >
-                        Send
-                    </button>
-                </form>
+      <ScrollArea className="flex-grow h-96 p-4">
+        {isLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-6 w-2/3" />
+            <Skeleton className="h-6 w-1/2" />
+          </div>
+        ) : (
+          messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex items-center space-x-2 mb-2 ${session?.user.id === String(msg.userId) ? "justify-end" : "justify-start"
+                }`}
+            >
+              <div className="bg-secondary max-w-[80%] p-2 rounded-lg">
+                <p className={session?.user?.id === String(msg.userId) ? "text-right" : "text-left"}>{msg.message}</p>
+              </div>
             </div>
-        </div>
-    );
+          ))
+        )}
+        <div ref={scrollRef} />
+      </ScrollArea>
+
+      <form onSubmit={sendMessage} className="flex items-center space-x-2 p-4">
+        <Input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="flex-grow"
+          placeholder="Type a message..."
+        />
+        <Button type="submit" variant="default">
+          Send
+        </Button>
+      </form>
+    </div>
+  )
 }

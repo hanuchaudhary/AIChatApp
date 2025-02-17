@@ -7,9 +7,9 @@ import { OutputContainer } from "./OutputContainer"
 export default function ChatLayout() {
 
   return (
-    <div className="h-[100vh] flex bg-neutral-800">
+    <div className="h-[100vh] flex">
       <Sidebar />
-      <div className="grid grid-cols-2 h-full">
+      <div className="flex h-full px-2 gap-2 w-full">
         <ChatArea />
         <OutputContainer />
       </div>

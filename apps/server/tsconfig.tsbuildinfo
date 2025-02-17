@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/socket/redis.config.ts","./src/socket/socket.ts"],"version":"5.7.3"}
+{"root":["./src/index.ts","./src/socket/redis.config.ts","./src/socket/socket.config.ts"],"version":"5.7.3"}

@@ -3,10 +3,11 @@ export interface chatInterface {
   title: string;
   description: string;
   creatorId: number;
+  createdAt: string;
 }
 
 export interface userTypes {
-  id: number;
+  id: string;
   username: string;
   email: string;
   image?: string;
