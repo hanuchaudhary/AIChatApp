@@ -26,7 +26,7 @@ export const socketInit = (io: Server) => {
   io.on("connection", (socket: CustomSocket) => {
     if (!socket.room) {
       console.error("Socket connected without a room!");
-      socket.disconnect(); // Disconnect the socket if no room is assigned
+      socket.disconnect();
       return;
     }
 
@@ -35,36 +35,45 @@ export const socketInit = (io: Server) => {
 
     socket.on("message", async (data: IncomingDataType) => {
       try {
+        // Fetch user details
+        const user = await prisma.user.findUnique({
+          where: { id: data.userId },
+          select: { id: true, username: true, image: true },
+        });
 
-        if (!prisma.message) {
-          console.error("Prisma message model is undefined");
-        } else {
-
-          const user = await prisma.user.findUnique({
-            where: {
-              id: data.userId,
-            },
-          });
-
-          if (!user) {
-            console.error("User not found in database");
-            return;
-          }
-
-          await prisma.message.create({
-            data: {
-              message: data.message,
-              chatId: data.chatId,
-              userId: data.userId,
-            },
-          });
-
-          console.log("Message saved to database");
+        if (!user) {
+          console.error("User not found in database");
+          return;
         }
 
-        // Broadcast message to room
-        socket.to(socket.room!).emit("message", data);
-        console.log("Message received:", data);
+        // Save the message to the database
+        const savedMessage = await prisma.message.create({
+          data: {
+            message: data.message,
+            chatId: data.chatId,
+            userId: data.userId,
+          },
+        });
+
+        // Construct message with user details
+        const enrichedMessage = {
+          id: savedMessage.id,
+          message: savedMessage.message,
+          chatId: savedMessage.chatId,
+          createdAt: savedMessage.createdAt,
+          user: {
+            id: user.id,
+            username: user.username,
+            image: user.image,
+          },
+        };
+
+        console.log("Enriched message:", enrichedMessage);
+        
+
+        // Broadcast enriched message to the room
+        socket.to(socket.room!).emit("message", enrichedMessage);
+        console.log("Message sent to room:", enrichedMessage);
       } catch (error) {
         console.error("Database error:", error);
       }

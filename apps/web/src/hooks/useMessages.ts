@@ -1,9 +1,10 @@
+import { IncomingDataType } from "@/components/ChatComponents/ChatArea";
 import { messageInterface } from "@/types/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 export const useMessages = (chatId: string) => {
-  const [messages, setMessages] = useState<messageInterface[]>([]);
+  const [messages, setMessages] = useState<IncomingDataType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchMessages = async (chatId: string) => {

@@ -50,13 +50,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userChats = await prisma.chat.findMany({
+    const userChats = await prisma.userChat.findMany({
       where: {
-        creatorId: session.user.id,
+        userId: session.user.id,
+      },
+      select: {
+        chat: true,
       },
     });
 
-    return NextResponse.json(userChats, { status: 200 });
+    return NextResponse.json(userChats.map((chat) => chat.chat), { status: 200 });
   } catch (error) {
     console.error("Chat fetch error:", error);
     return NextResponse.json(
